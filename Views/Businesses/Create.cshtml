@@ -1,0 +1,179 @@
+﻿@using Bistronger.Models.Businesses
+@using Bistronger.Data.Enums
+@using Bistronger.Data
+@inject Bistronger.Data.Design.IMenuManager menuManager
+
+@model BusinessCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Creëer een nieuwe zaak</h1>
+
+<h4>Zaak</h4>
+<hr />
+<form enctype="multipart/form-data" asp-action="Create">
+    <div class="row">
+        <div class="col-md-6">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Naam</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label">Zaak type</label>
+                <select asp-for="Type" class="form-control">
+                    @foreach (BusinessType businessType in (BusinessType[])Enum.GetValues(typeof(BusinessType)))
+                    {
+                        if (businessType != BusinessType.Unknown)
+                        {
+                            <option>@businessType</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Omschrijving">Omschrijving</label>
+                <textarea class="form-control" asp-for="Omschrijving"></textarea>
+                <span asp-validation-for="Omschrijving" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-group">
+                    <label asp-for="DisplayPicture">Afbeelding</label>
+                    <div class="custom-file">
+                        <input asp-for="DisplayPicture" class="form-control custom-file-input" />
+                        <label asp-for="DisplayPicture" class="custom-file-label">Kies bestand...</label>
+                    </div>
+                </div>
+            </div>
+
+            @if (menuManager.GetMenus().Data.Count > 0)
+            {
+                <div class="form-group">
+                    <label asp-for="MenuID" class="control-label pt">Menu</label>
+                    <select id="menuSelect" asp-for="MenuID" class="form-control" onchange="GetMenuInfo()">
+                        <option selected value="-1">Selecteer een menu</option>
+                        @foreach (Menu menu in (menuManager.GetMenus().Data))
+                        {
+                            <option value="@menu.ID">@menu.Naam</option>
+                        }
+                    </select>
+                    <span asp-validation-for="MenuID" class="text-danger"></span>
+
+                    <div id="menuLinkGroup" class="pt-2" style="visibility:hidden">
+                        <a href="#" target="_blank" id="menuLink">Items die op dit menu staan</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <p>Nadat u menu's heeft gemaakt kan u deze toekennen aan de zaak via de edit.</p>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Street" class="control-label">Straatnaam</label>
+                <input asp-for="Street" class="form-control" />
+                <span asp-validation-for="Street" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HouseNumber" class="control-label">Huisnummer</label>
+                <input asp-for="HouseNumber" class="form-control" type="number"
+                       step="1"
+                       onkeypress="return event.keyCode === 8 || (event.charCode >= 48 && event.charCode <= 57) || (event.charCode >= 0 && event.charCode <= 9)" />
+                <span asp-validation-for="HouseNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Mailbox" class="control-label">Bus</label>
+                <input asp-for="Mailbox" class="form-control" />
+                <span asp-validation-for="Mailbox" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Zipcode" class="control-label">Postcode</label>
+                <input asp-for="Zipcode" class="form-control" type="number"
+                       step="1"
+                       onkeypress="return event.keyCode === 8 || (event.charCode >= 48 && event.charCode <= 57) || (event.charCode >= 0 && event.charCode <= 9)" />
+                <span asp-validation-for="Zipcode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="City" class="control-label">Stad</label>
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Social.Website" class="control-label">Website</label>
+                <input asp-for="Social.Website" class="form-control" />
+                <span asp-validation-for="Social.Website" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Social.Facebook" class="control-label">Facebook</label>
+                <input asp-for="Social.Facebook" class="form-control" />
+                <span asp-validation-for="Social.Facebook" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Social.Instagram" class="control-label">Instagram</label>
+                <input asp-for="Social.Instagram" class="form-control" />
+                <span asp-validation-for="Social.Instagram" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Social.Twitter" class="control-label">Twitter</label>
+                <input asp-for="Social.Twitter" class="form-control" />
+                <span asp-validation-for="Social.Twitter" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BusinessHours" class="control-label">Openingsuren</label>
+        <div class="card-deck">
+            @for (int i = 0; i < Model.BusinessHours.Count; i++)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="card border-primary mb-3" style="min-width: 178px; max-width: 178px;">
+                        <div class="card-header">@Model.BusinessHours[i].Day</div>
+                        <div class="card-body">
+                            <input asp-for="@Model.BusinessHours[i].Day" type="hidden" />
+                            Open: <input asp-for="@Model.BusinessHours[i].OpeningsHour" type="time" min="00" max="24" />
+                            <br />
+                            <hr />
+                            Close: <input asp-for="@Model.BusinessHours[i].ClosingHour" type="time" min="00" max="24" />
+                            <span asp-validation-for="@Model.BusinessHours[i].ClosingHour" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+        <a asp-action="Index">Terug naar de lijst</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        function GetMenuInfo() {
+            var selectedMenuId = document.getElementById("menuSelect").value;
+
+            if (selectedMenuId != "-1") {
+                //Is niet variabel op controller/action, als controller of action naam veranderd moet dit ook veranderen
+                document.getElementById("menuLinkGroup").style.visibility = "visible";
+                document.getElementById("menuLink").href = "/Menus/Details/" + selectedMenuId;
+            }
+            else {
+                document.getElementById("menuLinkGroup").style.visibility = "hidden";
+                document.getElementById("menuLink").href = "#";
+            }
+        }
+    </script>
+}

@@ -1,0 +1,68 @@
+﻿@using Bistronger.Models.Items
+@using Bistronger.Data.Enums
+
+@model ItemCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Creëer</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form enctype="multipart/form-data" asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Naam</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Beschrijving</label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label">Prijs</label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class="form-control">
+                    @foreach (ItemType itemType in (ItemType[])Enum.GetValues(typeof(ItemType)))
+                    {
+                        if (itemType != ItemType.Unknown && itemType != ItemType.Advert)
+                        {
+                            <option>@itemType</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DisplayPicture">Afbeelding</label>
+                <div class="custom-file">
+                    <input asp-for="DisplayPicture" class="form-control custom-file-input" />
+                    <label asp-for="DisplayPicture" class="custom-file-label">Kies bestand...</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Toevoegen" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Terug naar de lijst.</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

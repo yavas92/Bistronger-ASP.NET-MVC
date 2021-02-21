@@ -1,0 +1,107 @@
+﻿@using Bistronger.Models.Reservations
+@using Bistronger.Data.Enums
+@using Bistronger.Data
+@using Bistronger.Data.Design
+
+@model ReservationIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (User.IsInRole(UserRoleType.Customer.ToString()))
+{
+    <h2>Overzicht reservaties</h2>
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>
+                    Naam bistro
+                </th>
+                <th>
+                    Reservatie Start
+                </th>
+                <th>
+                    Reservatie Eind
+                </th>
+                <th>
+                    Aantal Personen
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var reservation in Model.Reservations.Data)
+            {
+                <tr>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.TableReservation.Business.Name)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.ReservationDateFrom)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.ReservationDateTo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.AmountOfGuests)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()) || User.IsInRole(UserRoleType.Admin.ToString()))
+{
+    <h2>Overzicht reservaties</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Emailadres Klant
+                </th>
+                <th>
+                    Naam Bistro
+                </th>
+                <th>
+                    Reservatie Start
+                </th>
+                <th>
+                    Reservatie Eind
+                </th>
+                <th>
+                    Aantal Personen
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var reservation in Model.Reservations.Data)
+            {
+                <tr>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.User.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.TableReservation.Business.Name)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.ReservationDateFrom)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.ReservationDateTo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => reservation.AmountOfGuests)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

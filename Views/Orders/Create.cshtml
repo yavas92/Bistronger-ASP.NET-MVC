@@ -1,0 +1,189 @@
+﻿@using Bistronger.Models.Orders
+@using Bistronger.Data.Enums
+
+@inject Bistronger.Data.Design.IMenuItemManager menuItemManager
+@inject Bistronger.Data.Design.IBusinessMenuManager busMenuManager
+@inject Bistronger.Data.Design.IBusinessManager businessManager
+
+
+@model OrderCreateViewModel
+
+@{
+	ViewData["Title"] = "Create";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var busHours = businessManager.GetBusinessHours(Model.BusinessID).Data;
+	var business = businessManager.GetBusinessForDetails(Model.BusinessID);
+
+}
+
+<h1>Bestelling</h1>
+
+@if (businessManager.GetBusinessOpenStatus(Model.BusinessID) == BusinessOpenStatus.Closed)
+{
+	<hr />
+	<p>Deze bistro is momenteel gesloten, dus u kunt geen bestellingen plaatsen.</p>
+	<p>Openingstijden voor <a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@business.ID" target="_blank">@business.Name</a>:</p>
+	<ul>
+		@{
+		}
+		@foreach (var item in busHours)
+		{
+			string hours = $"{item.Day} {item.OpeningsHour.ToShortTimeString()} - {item.ClosingHour.ToShortTimeString()}";
+
+			<li>@hours</li>
+		}
+	</ul>
+}
+else
+{
+
+	@if (Model.BusMenu != null)
+	{
+		<h4>Menu: @Model.BusMenu.Menu.Naam - Bistro: @Model.BusMenu.Business.Name</h4>
+		<hr />
+		<form asp-action="Create">
+			<div class="row">
+				<div class="col-md-6">
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<input type="hidden" asp-for="UserID" />
+					<input type="hidden" asp-for="BusinessID" />
+					<input type="hidden" asp-for="MenuItems" />
+
+					@{int teller = 0;
+					}
+					@foreach (ItemType itemType in (ItemType[])Enum.GetValues(typeof(ItemType)))
+					{
+						if (itemType != ItemType.Unknown && itemType != ItemType.Advert)
+						{
+							<div class="d-flex justify-content-between">
+								<h5>
+									@EnumHelper.GetDisplayName(itemType)
+								</h5>
+								<h5 class="float-right">Credits</h5>
+
+							</div>
+							<hr class="hrMenu" />
+
+							<div class="form-group">
+								@{int itemFound = 0;
+
+								}
+
+								@foreach (var item in Model.MenuItems)
+								{
+									if
+										(item.Item.Type == itemType)
+									{
+										itemFound++;
+
+										<div class="form-group">
+											<input hidden asp-for="OrderLines[teller].ItemID" value="@item.Item.ID" />
+											<input asp-for="OrderLines[teller].Amount"
+												   class="form-control col-md-2 orderAmount" style="display:inline-flex" type="number"
+												   step="1" min="0" oninput="checkForButton()" itemName="@item.Item.Name" itemPrice="@item.Item.Price"
+												   onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57 || event.charCode >= 0 && event.charCode <= 9" />
+											<a class="control-label pl-2" asp-action="Details" asp-controller="Items" asp-route-id=@item.Item.ID target="_blank">@item.Item.Name</a>
+											<label class="control-label pl-2 float-right mt-3">@item.Item.Price</label>
+											<span asp-validation-for="OrderLines[teller].Amount" class="text-danger"></span>
+										</div>
+										teller++;
+									}
+								}
+
+								@if (itemFound == 0)
+								{
+									<p>Niet aanwezig op menu.</p>
+								}
+							</div>
+						}
+					}
+
+					<div class="form-group">
+						<input type="submit" value="Plaats order" class="btn btn-primary" id="submitButton" disabled />
+						<a asp-action="Index" asp-controller="Businesses">Terug naar Bistros</a>
+					</div>
+				</div>
+
+				<div class="col-md-6 pl-5">
+					<div class="d-flex justify-content-between">
+						<h5>Bestelling details</h5>
+						<h5>Credits</h5>
+					</div>
+					<hr class="hrMenu" />
+
+					<div id="containerDetails">
+						<p>Geen items geselecteerd.</p>
+					</div>
+					<hr class="hrMenu" />
+					<div class="d-flex justify-content-between" id="containerTotal">
+						<p style="font-weight:bold;font-size:1.3rem">Totaal</p>
+						<p style="font-weight:bold;font-size:1.3rem" id="totalPrice">0,00</p>
+					</div>
+				</div>
+			</div>
+		</form>
+	}
+	else
+	{
+		<hr />
+		<p>Menu niet beschikbaar.</p>
+
+		<div class="form-group">
+			<a asp-action="Index" asp-controller="Businesses">Terug naar Bistros</a>
+		</div>
+	}
+}
+
+@section Scripts {
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+	<script>
+
+		function checkForButton() {
+			if (isEveryInputEmpty()) {
+				document.getElementById('submitButton').disabled = true;
+			} else {
+				document.getElementById('submitButton').disabled = false;
+			}
+
+			calculateDetails();
+		}
+
+		//https://stackoverflow.com/questions/26931755/check-if-all-inputs-are-empty/26931859
+		function isEveryInputEmpty() {
+			var allEmpty = true;
+			$(".orderAmount").each(function () {
+				if ($(this).val() !== "0" && $(this).val() !== "") {
+					allEmpty = false;
+					return false; // we've found a non-empty one, so stop iterating
+				}
+			});
+
+			return allEmpty;
+		}
+
+		function calculateDetails() {
+			$('#containerDetails').text("");
+			var totalPrice = 0;
+
+			$(".orderAmount").each(function () {
+				if ($(this).val() !== "0" && $(this).val() !== "") {
+
+					var amount = $(this).val();
+					var itemName = $(this).attr("itemName");
+					var price = $(this).attr("itemPrice").replace(',', '.');
+					var totalPriceItem = amount * price;
+					totalPrice += totalPriceItem;
+
+					$('#containerDetails').append('<div class="d-flex justify-content-between"><p>' + amount + 'x ' + itemName + '</p><p>' + totalPriceItem.toFixed(2).replace('.', ',') + '</p></div>');
+				}
+			});
+
+			if ($('#containerDetails').children().length == 0) {
+				$('#containerDetails').text("Geen items geselecteerd.");
+			}
+
+			$('#totalPrice').text(totalPrice.toFixed(2).replace('.', ','));
+		}
+	</script>
+}

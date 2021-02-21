@@ -1,0 +1,48 @@
+﻿@model Bistronger.Data.Package
+
+@{
+    ViewData["Title"] = "Verwijderen";
+}
+
+<h1>Verwijderen</h1>
+
+<h3>Ben je zeker dat je dit package wilt verwijderen?</h3>
+<div>
+    <h4>Package</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-4">
+            ID
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.ID)
+        </dd>
+
+        <dt class="col-sm-4">
+            Type
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+
+        <dt class="col-sm-4">
+            Hoeveelheid shows/credits
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Amount)
+        </dd>
+
+        <dt class="col-sm-4">
+            Prijs
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID" />
+        <input type="submit" value="Verwijderen" class="btn btn-danger" /> |
+        <a asp-action="Index">Terug naar overzicht</a>
+    </form>
+</div>

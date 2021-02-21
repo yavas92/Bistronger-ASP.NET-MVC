@@ -1,0 +1,87 @@
+﻿@using Bistronger.Models.Items
+@using Bistronger.Data.Enums
+
+@model ItemDetailViewModel
+
+@{
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Product</h4>
+    <hr />
+    <div class="col-md-12 row">
+        <dl class="row col-md-6">
+            @if (User.IsInRole(UserRoleType.Admin.ToString()))
+            {
+                <dt class="col-sm-2">
+                    Item ID:
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.ID)
+                </dd>
+                <dt class="col-sm-2">
+                    Email:
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
+            }
+            <dt class="col-sm-2">
+                Naam
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt class="col-sm-2">
+                Beschrijving
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt class="col-sm-2">
+                Prijs
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+            <dt class="col-sm-2">
+                Type
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Type)
+            </dd>
+            <dt class="col-sm-2">
+                Afbeelding:
+            </dt>
+            <dd class="col-sm-10">
+                @if (Model.DisplayPicture != null)
+                {
+                    <a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@Model.ID">
+                        <img src="data:image;base64,@System.Convert.ToBase64String(Model.DisplayPicture)" alt="Image of business @Model.Name" class="card-img" />
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@Model.ID">
+                        <img src="~/res/img/noimage.png" alt="No picture" class="card-img" />
+                    </a>
+                }
+            </dd>
+        </dl>
+    </div>
+
+
+</div>
+
+
+@if (!User.IsInRole(UserRoleType.Customer.ToString()))
+{
+	<div>
+		<a asp-action="Edit" asp-route-id="@Model.ID">Bewerken</a> |
+		<a asp-action="Index">Terug naar de lijst.</a>
+	</div>
+}

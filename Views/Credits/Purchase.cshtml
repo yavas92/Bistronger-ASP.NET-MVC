@@ -1,0 +1,62 @@
+﻿@using Bistronger.Models.Credits
+@using Bistronger.Data.Enums
+@using Bistronger.Data
+
+@model CreditPurchaseViewModel
+
+@{
+    ViewData["Title"] = "Aankoop";
+}
+
+@if (User.Identity.IsAuthenticated && !User.IsInRole(UserRoleType.Admin.ToString()))
+{
+    <div class="container" style="text-align:center">
+        <h2>Maak uw keuze:</h2>
+        <hr />
+
+        <form enctype="multipart/form-data" asp-action="purchase">
+            <div class="form-group">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    @{
+                        int count = 0;
+                    }
+                    @foreach (Package package in Model.Packages)
+                    {
+                        <div class="col-auto mb-3">
+                            <div class="card" style="width: 15rem">
+                                <div class="card-body" style="text-align:center">
+                                    <h4 class="card-title">
+                                        @package.Amount Credits
+                                    </h4>
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        €@package.Price
+                                    </h6>
+                                    <p class="card-text">
+                                        Koop @package.Amount credit(s).
+                                    </p>
+                                    @if (count == 0)
+                                    {
+                                        count++;
+                                        <label class="btn btn-primary active">
+                                            <input asp-for="SelectedPackageID" value="@package.ID" type="radio" id="fade" autocomplete="off" style="display:none">Selecteer
+                                        </label>
+                                    }
+                                    else
+                                    {
+                                        <label class="btn btn-primary">
+                                            <input asp-for="SelectedPackageID" value="@package.ID" type="radio" id="fade" autocomplete="off" style="display:none">Selecteer
+                                        </label>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <br />
+                <input type="submit" value="Koop" class="btn btn-success" />
+                <br />
+                <a asp-action="index" class="btn btn-secondary">Terug</a>
+            </div>
+        </form>
+    </div>
+}

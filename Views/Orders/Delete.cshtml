@@ -1,0 +1,126 @@
+﻿@using Bistronger.Data.Enums
+@using Bistronger.Models.Orders
+
+@model OrderDetailViewModel
+
+@{
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Annuleren</h1>
+<h3>Zeker dat je dit order wilt annuleren?</h3>
+
+<div>
+	<h4>Order</h4>
+	<hr />
+	<dl class="row">
+		@*<dt class="col-sm-2">
+				@Html.DisplayNameFor(model => model.User)
+			</dt>
+			<dd class="col-sm-10">
+				@Html.DisplayFor(model => model.User.UserName)
+			</dd>*@
+		<dt class="col-sm-2">
+			Type bestelling:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.OrderType)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Status):
+		</dt>
+		<dd class="col-sm-10">
+			@{
+				var dispName = @EnumHelper.GetDisplayName(Model.Status);
+			}
+			@switch (Model.Status)
+			{
+				case OrderStatus.Finished:
+					<span class="badge badge-pill badge-success">@dispName</span>
+					break;
+				case OrderStatus.Unpaid:
+					<span class="badge badge-pill badge-warning">@dispName</span>
+					break;
+				case OrderStatus.InProgress:
+					<span class="badge badge-pill badge-info">@dispName</span>
+					break;
+				case OrderStatus.Cancelled:
+					<span class="badge badge-pill badge-danger">@dispName</span>
+					break;
+			}
+		</dd>
+		<dt class="col-sm-2">
+			Aangemaakt op:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.CreatedOn)
+		</dd>
+	</dl>
+	<hr />
+	<div class="row">
+		<div class="col-md-6">
+			@{
+				decimal totalPrice = 0.0m;
+			}
+
+			@foreach (ItemType itemType in (ItemType[])Enum.GetValues(typeof(ItemType)))
+			{
+				if (itemType != ItemType.Unknown && itemType != ItemType.Advert)
+				{
+					if (Model.OrderLines.Any(m => m.Item.Type == itemType))
+					{
+						<div class="d-flex justify-content-between">
+							<h5>
+								@EnumHelper.GetDisplayName(itemType)
+							</h5>
+							<h5 class="float-right">Credits</h5>
+						</div>
+						<hr class="hrMenu" />
+
+						decimal subtotaalCategorie = 0.0m;
+
+
+						@foreach (var item in Model.OrderLines)
+						{
+							if
+								(item.Item.Type == itemType)
+							{
+								<div class="d-flex justify-content-between">
+									@{
+										var totalItemPrice = item.Amount * item.Item.Price;
+										subtotaalCategorie += totalItemPrice.Value;
+									}
+									<div>
+										<label>@item.Amount x</label>
+										<a asp-action="Details" asp-controller="Items" asp-route-id=@item.Item.ID target="_blank">@item.Item.Name</a>
+									</div>
+									<div>
+										<label>@totalItemPrice</label>
+									</div>
+								</div>
+							}
+						}
+						totalPrice += subtotaalCategorie;
+
+
+						<div class="d-flex justify-content-between">
+							<p style="font-weight:bold">Subtotaal</p>
+							<p style="font-weight:bold">@subtotaalCategorie</p>
+						</div>
+					}
+				}
+			}
+			<div class="d-flex justify-content-between">
+				<p style="font-weight:bold;font-size:1.3rem">Totaal</p>
+				<p style="font-weight:bold;font-size:1.3rem">@totalPrice</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<form asp-action="Delete">
+	<input type="hidden" asp-for="ID" />
+	<input type="submit" value="Annuleer" class="btn btn-danger" /> |
+	<a asp-action="Index">Terug naar overzicht</a>
+</form>

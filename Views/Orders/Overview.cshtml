@@ -1,0 +1,71 @@
+﻿@using Bistronger.Models.Orders
+@using Bistronger.Data.Enums
+
+@model OrderOverviewViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Overzicht bestellingen</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Orders.Data[0].BusinessID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Orders.Data[0].OrderType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Orders.Data[0].Status)
+            </th>
+            <th>
+                Aangemaakt op
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Orders.Data)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.BusinessID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderType)
+            </td>
+            <td>
+                @{
+                    var dispName = @EnumHelper.GetDisplayName(item.Status);
+                }
+                @switch (item.Status)
+                {
+                    case OrderStatus.Finished:
+                        <span class="badge badge-pill badge-success">@dispName</span>
+                        break;
+                    case OrderStatus.Unpaid:
+                        <span class="badge badge-pill badge-warning">@dispName</span>
+                        break;
+                    case OrderStatus.InProgress:
+                        <span class="badge badge-pill badge-info">@dispName</span>
+                        break;
+                    case OrderStatus.Cancelled:
+                        <span class="badge badge-pill badge-danger">@dispName</span>
+                        break;
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedOn)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

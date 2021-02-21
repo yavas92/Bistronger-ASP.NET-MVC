@@ -1,0 +1,108 @@
+﻿@using Bistronger.Models
+@using Bistronger.Data.Design
+@using Bistronger.Data.Enums
+@using Bistronger.Data
+
+@inject IAdvertManager AdvertManager
+
+@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = "_HomeLayout";
+}
+
+<div id="subheader" class="container searchContainer col-sm-12">
+
+    <div class="text-center mx-auto">
+        <header class="display-4 text-white m-2">Foodies aan tafel brengen in de bistro</header>
+        @if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()) || User.IsInRole(UserRoleType.Admin.ToString()))
+        {
+        }
+        else
+        {
+            <form asp-action="Index" asp-controller="businesses"
+                  class="form-inline m-2">
+                <div class="mx-auto">
+                    <input asp-for="filter.Zipcode" class="form-control mr-sm-2" placeholder="Geef je postcode in">
+                    <button class="btn btn-secondary my-2 my-sm-0" type="submit">
+                        Zoeken
+                    </button>
+                </div>
+            </form>
+        }
+    </div>
+</div>
+<div>
+
+    <div class="container">
+        @{
+            List<Advert> AdvertData = AdvertManager.GetAdverts(false).Data;
+        }
+        @if (AdvertData.Count > 0)
+        {
+            int cardNumber = 0;
+            <div class="text-center" style="margin:40px">
+                <h1>Bistros in de kijker</h1>
+            </div>
+            <div class="row">
+                @for (int i = 0; i < AdvertData.Count; i++)
+                {
+                    cardNumber++;
+                    Advert advert = AdvertData[i];
+
+                    <div class="col-sm-3" style="padding-bottom: 10px; padding-top: 10px;">
+                        <div class="card">
+                            <a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@advert.Business.ID">
+                                <div class="ribbon ribbon-top-left">
+                                    <span>promoted</span>
+                                </div>
+                            </a>
+                            @if (advert.PhotoData != null)
+                            {
+                                <a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@advert.Business.ID">
+                                    <img class="card-img-top" alt="Image of business @advert.Business.Name" src="data:image;base64,@System.Convert.ToBase64String(advert.PhotoData)" style="object-fit: cover; height:200px">
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@advert.Business.ID">
+                                    <img class="card-img-top" alt="No picture" src="~/res/img/noimage.png" style="object-fit: cover; height:200px">
+                                </a>
+                            }
+                            <div class="card-header">
+                                <h4 class="card-title">@advert.Business.Name</h4>
+                                <h5 class="card-subtitle text-muted">@EnumHelper.GetDisplayName(advert.Business.Type)</h5>
+                            </div>
+                            @if (!String.IsNullOrWhiteSpace(advert.Business.Omschrijving))
+                            {
+                                <a data-toggle="collapse" href="#collapse-bistro-@cardNumber" aria-expanded="true" aria-controls="collapse-example" id="heading-example"
+                                   class="d-block collapsed" style="text-decoration: none; color: inherit;">
+
+                                    <div class="card-body">
+                                        Omschrijving <i class="fa fa-chevron-down rotate pull-right vertical-center"></i>
+                                    </div>
+                                </a>
+                            }
+                            @if (!String.IsNullOrWhiteSpace(advert.Business.Omschrijving))
+                            {
+                                <div id="collapse-bistro-@cardNumber" class="collapse" aria-labelledby="heading-example">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            @advert.Business.Omschrijving
+                                        </li>
+                                    </ul>
+                                </div>
+                            }
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item text-muted">
+                                    @advert.Business.Street @advert.Business.HouseNumber, @advert.Business.Zipcode @advert.Business.City
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

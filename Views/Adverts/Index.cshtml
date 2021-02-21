@@ -1,0 +1,115 @@
+﻿@using Bistronger.Models.Adverts
+@using Bistronger.Data.Enums
+
+@model AdvertIndexViewModel
+
+@{
+    ViewData["Title"] = "Overzicht";
+}
+
+@if (User.Identity.IsAuthenticated && !User.IsInRole(UserRoleType.Customer.ToString()))
+{
+    <h1>Overzicht</h1>
+    <hr />
+
+    @if (!User.IsInRole(UserRoleType.Admin.ToString()))
+    {
+        <p style="text-align:center">
+            <a asp-action="purchase" type="button" class="btn btn-success btn-lg">Koop nieuwe advertentie</a>
+        </p>
+        <hr />
+    }
+    else
+    {
+        <form asp-action="index">
+            <h3>Filter</h3>
+
+            <div class="row" style="margin-left:1px">
+                <div class="form-group col-sm-3">
+                    <label>Business ID: </label>
+                    <input asp-for="Filter.BusinessID" />
+                </div>
+            </div>
+
+            <div class="row" style="margin-left:15px">
+
+                <div class="form-group col-xs-6">
+                    <button class="btn btn-primary" asp-action="index" type="submit">
+                        Filter
+                    </button>
+                </div>
+                <div class="form-group col-xs-6">
+                    <a class="btn btn-light" asp-action="index">
+                        Ongedaan maken
+                    </a>
+                </div>
+            </div>
+        </form>
+    }
+    var advertData = Model.Adverts.Data;
+    if (advertData.Count > 0)
+    {
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>
+                        ID
+                    </th>
+                    @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                    {
+                        <th>
+                            Zaak ID
+                        </th>
+                    }
+                    <th>
+                        Datum
+                    </th>
+                    <th>
+                        Resterende weergaven
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in advertData)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ID)
+                        </td>
+                        @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BusinessID)
+                            </td>
+                        }
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CreatedOn)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Shows)
+                        </td>
+                        @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                        {
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                                <a asp-action="Delete" asp-route-id="@item.ID">Verwijderen</a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h1>Geen advertenties gevonden.</h1>
+    }
+}

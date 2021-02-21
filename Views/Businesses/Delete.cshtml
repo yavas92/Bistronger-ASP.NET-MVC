@@ -1,0 +1,79 @@
+﻿@* Stijn *@
+
+@model Bistronger.Data.Business
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Verwijderen</h1>
+
+<h3>Bent u zeker dat u dit wenst te verwijderen?</h3>
+<div>
+    <h4>Zaak</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Naam:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            Straatnaam:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Street)
+        </dd>
+        <dt class="col-sm-2">
+            Huisnummer:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.HouseNumber)
+        </dd>
+        <dt class="col-sm-2">
+            Bus:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Mailbox)
+        </dd>
+        <dt class="col-sm-2">
+            Postcode:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Zipcode)
+        </dd>
+        <dt class="col-sm-2">
+            Stad:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.City)
+        </dd>
+        <dt class="col-sm-2">
+            Zaak type:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        <dt class="col-sm-2">
+            Afbeelding:
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.DisplayPicture != null)
+            {
+                <img src="data:image;base64,@System.Convert.ToBase64String(Model.DisplayPicture)" alt="Image of business @Model.Name" class="main-business-picture" />
+            }
+            else
+            {
+                <img src="~/res/img/noimage.png" alt="No picture" class="main-business-picture" />
+            }
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Terug naar de lijst</a>
+    </form>
+</div>

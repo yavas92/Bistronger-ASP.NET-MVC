@@ -1,0 +1,82 @@
+﻿@using Bistronger.Data.Enums
+@using Bistronger.Models.Tables
+
+@model TableIndexViewModel
+
+@{
+    ViewData["Title"] = "Tafeloverzicht";
+}
+
+<h1>Tafeloverzicht voor @Model.Business.Name</h1>
+
+<p style="text-align:center">
+    <a asp-action="add" asp-route-businessID="@Model.Business.ID" type="button" class="btn btn-success btn-lg">Voeg Tafel Toe</a>
+</p>
+<hr />
+
+@if (Model.Tables.Data.Count > 0)
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                {
+                    <th>
+                        ID
+                    </th>
+                }
+                <th>
+                    Zitplaatsen
+                </th>
+                <th>
+                    Huidige Beschikbaarheid
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var table in Model.Tables.Data)
+            {
+                <tr>
+                    @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => table.ID)
+                        </td>
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => table.Seats)
+                    </td>
+                    <td>
+                        @if (table.Available)
+                        {
+                            <span class="badge badge-pill badge-success">Beschikbaar</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-pill badge-danger">Gereserveerd</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="edit" asp-route-id="@table.ID">Bewerken</a> |
+                        @{
+                            var formName = $"deleteForm{table.ID}";
+                        }
+                        <form id="@formName" asp-action="delete" asp-route-id="@table.ID" asp-route-businessID="@Model.Business.ID">
+                            <a onclick="document.getElementById('@formName').submit();" class="text-danger" href="javascript:{}">Verwijderen</a>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h4>Er zijn nog geen tafels toegevoegd aan deze bistro.</h4>
+}
+
+<div>
+    <a asp-controller="businesses" asp-action="Index">Terug naar overzicht</a>
+</div>

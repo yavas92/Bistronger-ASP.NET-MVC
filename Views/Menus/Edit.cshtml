@@ -1,0 +1,138 @@
+﻿@using Bistronger.Models.Menus
+@using Bistronger.Data.Enums
+
+@model MenuEditViewModel
+
+@{
+	ViewData["Title"] = "Edit";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Bewerken</h1>
+
+<h4>Menu</h4>
+<hr />
+<div class="row">
+	<div class="col-md-12">
+		<form asp-action="Edit">
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<input type="hidden" asp-for="OwnerID"/>
+
+			@if (User.IsInRole(UserRoleType.Admin.ToString()))
+			{
+				<div class="form-group col-md-3 pl-0">
+					<label class="control-label">Menu ID: @Model.ID</label>
+				</div>
+				<div class="form-group col-md-3 pl-0">
+					<label class="control-label">Email: @Model.Email</label>
+				</div>
+			}
+			<div class="row pl-3">
+				<div class="form-group col-md-3 pl-0">
+					<label asp-for="Name" class="control-label">Naam</label>
+					<input asp-for="Name" class="form-control" />
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label class="control-label" style="visibility:hidden">Naam</label>
+					<input type="submit" value="Bewerk naam" class="form-control btn btn-primary" />
+				</div>
+			</div>
+			@{if (Model.Items.Count == 0)
+				{
+					<div class="alert alert-dismissible alert-info">
+						<button type="button" class="close" data-dismiss="alert">×</button>
+						<strong>U heeft nog geen producten aangemaakt!</strong> <a asp-action="Create" asp-controller="Items" class="alert-link">Producten toevoegen.</a>
+					</div>
+				}
+			}
+			<div>
+
+			</div>
+			<div class="row">
+				<div class="col col-md-5">
+					<div class="form-group">
+						<label asp-for="MenuItems" class="control-label">Menu items</label>
+						<select id="menuList" asp-for="MenuItems" asp-items="@(new SelectList(Model.MenuItems, "ItemID", "Item.Name"))" class="form-control pl-0 pr-0 pt-0 pb-0" multiple size="12">
+						</select>
+					</div>
+				</div>
+				<div class="col my-auto">
+					<div class="form-group my-auto text-center">
+						<button type="button" class="btn btn-primary" id="addToMenu"><<</button>
+						<button type="button" class="btn btn-secondary" id="deleteFromMenu">>></button>
+					</div>
+				</div>
+				<div class="col col-md-5">
+					<div class="form-group">
+						<label asp-for="Items" class="control-label"></label>
+						<select id="itemList" asp-for="Items" asp-items="@(new SelectList(Model.Items, "ID", "Name"))" class="form-control pl-0 pr-0 pt-0 pb-0" multiple size="12">
+						</select>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div>
+	<a asp-action="Index">Terug naar overzicht</a>
+</div>
+
+@section Scripts {
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+	<script>
+        document.getElementById('addToMenu').onclick = function () {
+            var stringIDS = "";
+
+            for (var option of document.getElementById('itemList').options) {
+                if (option.selected) {
+                    stringIDS += option.value + ",";
+                }
+            }
+
+            stringIDS = stringIDS.substring(0, stringIDS.length - 1);
+
+            $.ajax({
+                url: '/api/MenuItems/',
+                method: 'POST',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    'MenuID': @Model.ID,
+                    'MenuItemString': stringIDS
+                }),
+                success: function () {
+                    $('#itemList option:selected').appendTo('#menuList');
+                }
+            })
+        }
+
+        document.getElementById('deleteFromMenu').onclick = function () {
+            var stringIDS = "";
+
+            for (var option of document.getElementById('menuList').options) {
+                if (option.selected) {
+                    stringIDS += option.value + ",";
+                }
+            }
+
+            stringIDS = stringIDS.substring(0, stringIDS.length - 1);
+
+            $.ajax({
+                url: '/api/MenuItems/',
+                method: 'DELETE',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    'MenuID': @Model.ID,
+                    'MenuItemString': stringIDS
+                }),
+                success: function () {
+                    $('#menuList option:selected').appendTo('#itemList');
+                }
+            })
+        }
+	</script>
+}

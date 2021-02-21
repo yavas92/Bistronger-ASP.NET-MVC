@@ -1,0 +1,66 @@
+﻿@using Bistronger.Models.Menus
+@using Bistronger.Data.Enums
+
+@model MenuIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Overzicht</h1>
+@if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()))
+{
+    <p>
+        <a asp-action="Create">Nieuw menu aanmaken</a>
+    </p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            @if (User.IsInRole(UserRoleType.Admin.ToString()))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Menus.Data[0].ID)
+                </th>
+            }
+            <th>
+                @Html.DisplayNameFor(model => model.Menus.Data[0].Naam)
+            </th>
+            @if (User.IsInRole(UserRoleType.Admin.ToString()))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Menus.Data[0].Owner.Email)
+                </th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Menus.Data)
+        {
+            <tr>
+                @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ID)
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.Naam)
+                </td>
+                @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Owner.Email)
+                    </td>
+                }
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID">Bewerken</a> |
+                    <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ID">Verwijderen</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

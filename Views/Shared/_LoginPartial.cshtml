@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Bistronger.Areas.Identity
+@using Bistronger.Data.Enums
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var appUser = UserManager.GetUserAsync(User).Result;
+}
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item my-auto dropdown show">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">Hallo @appUser.FirstName!</a>
+			<div class="dropdown-menu">
+				<a class="dropdown-item" asp-area="identity" asp-page="/account/manage/index" title="Manage">Account</a>
+				<div class="dropdown-divider"></div>
+				<a class="dropdown-item" asp-controller="credits" asp-action="index">Credits</a>
+				@if (User.IsInRole(UserRoleType.Customer.ToString()) || User.IsInRole(UserRoleType.Admin.ToString()))
+				{
+					<a class="dropdown-item" asp-controller="Orders" asp-action="index">Bestellingen</a>
+				}
+				else if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()))
+				{
+					<a class="dropdown-item" asp-controller="Orders" asp-action="overview">Bestellingen</a>
+				}
+				<a class="dropdown-item" asp-controller="reservations" asp-action="index">Reservaties</a>
+
+				@if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()) || User.IsInRole(UserRoleType.Admin.ToString()))
+				{
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" asp-controller="adverts" asp-action="index">Advertenties</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" asp-controller="items" asp-action="index">Producten</a>
+					<a class="dropdown-item" asp-controller="menus" asp-action="index">Menus</a>
+
+				}
+				@if (User.IsInRole(UserRoleType.Admin.ToString()))
+				{
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item" asp-controller="PurchasePackages" asp-action="index">Packages</a>
+				}
+
+				<div class="dropdown-divider"></div>
+
+				<form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+					<a onclick="document.getElementById('logoutForm').submit();" class="dropdown-item text-danger" href="javascript:{}" style="font-weight:bolder">Afmelden</a>
+				</form>
+			</div>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Registreren</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Aanmelden</a>
+        </li>
+    }
+</ul>

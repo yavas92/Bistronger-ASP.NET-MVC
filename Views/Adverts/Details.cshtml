@@ -1,0 +1,57 @@
+﻿@using Bistronger.Models.Adverts
+@model AdvertDetailViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Advertentie</h4>
+    <hr />
+    <dl class="row">
+
+        <dt class="col-sm-2">
+            ID
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Advert.ID)
+        </dd>
+        <dt class="col-sm-2">
+            Start Datum
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Advert.CreatedOn)
+        </dd>
+        <dt class="col-sm-2">
+            Zaak
+        </dt>
+        <dd class="col-sm-10">
+            <a asp-controller="businesses" asp-action="Details" asp-route-id="@Model.Advert.BusinessID">@Html.DisplayFor(model => model.Advert.Business.Name)</a>            
+        </dd>
+        <dt class="col-sm-2">
+            Resterende weergaven
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Advert.Shows)
+        </dd>
+
+        <dt class="col-sm-2">
+            Afbeelding
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Advert.PhotoData != null)
+            {
+                <img src="data:image;base64,@System.Convert.ToBase64String(Model.Advert.PhotoData)" width="200" />
+            }
+            else
+            {
+                <img src="~/res/img/noimage.png" alt="Geen afbeelding" class="main-business-picture" />
+            }
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index">Terug naar overzicht</a>
+</div>

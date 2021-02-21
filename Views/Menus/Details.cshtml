@@ -1,0 +1,49 @@
+﻿@using Bistronger.Models.Menus
+@using Bistronger.Data.Enums
+
+@model MenuDetailViewModel
+
+@{
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+	<h4>Menu - @Model.Naam</h4>
+	<hr />
+	<input type="hidden" asp-for="ID" />
+
+	@foreach (ItemType itemType in (ItemType[])Enum.GetValues(typeof(ItemType)))
+	{
+		if (itemType != ItemType.Unknown && itemType != ItemType.Advert)
+		{
+			if (Model.menuItems.Data.Any(m => m.Item.Type == itemType))
+			{
+				<div class="mt-2">
+					<h5>
+						@EnumHelper.GetDisplayName(itemType)
+					</h5>
+				</div>
+				<hr class="hrMenu" />
+
+				@foreach (var item in Model.menuItems.Data)
+				{
+					if
+						(item.Item.Type == itemType)
+					{				
+							<div>
+								<a asp-action="Details" asp-controller="Items" asp-route-id=@item.Item.ID target="_blank">@item.Item.Name</a>
+							</div>				
+					}
+				}
+			}
+		}
+	}
+	<hr/>
+</div>
+<div>
+	<a asp-action="Edit" asp-route-id="@Model.ID">Bewerken</a> |
+	<a asp-action="Index">Terug naar overzicht</a>
+</div>

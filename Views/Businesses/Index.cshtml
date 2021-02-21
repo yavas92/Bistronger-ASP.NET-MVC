@@ -1,0 +1,277 @@
+@using Bistronger.Areas.Identity.Manage
+@using Bistronger.Models.Businesses
+@using Bistronger.Data.Design
+@using Bistronger.Data.Enums
+@using Bistronger.Data
+
+@inject IBusinessManager BusinessManager
+
+@model BusinessIndexViewModel
+
+@{
+	ViewData["Title"] = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()) || User.IsInRole(UserRoleType.Admin.ToString()))
+{
+	<h1>Bistro Overzicht</h1>
+	if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()))
+	{
+		<p>
+			<a asp-action="Create">Nieuwe zaak toevoegen</a>
+		</p>
+	}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					Afbeelding
+				</th>
+				@if (User.IsInRole(UserRoleType.Admin.ToString()))
+				{
+					<th>
+						@Html.DisplayNameFor(model => model.Businesses.Data[0].ID)
+					</th>
+				}
+				<th>
+					Naam
+				</th>
+				@if (User.IsInRole(UserRoleType.Admin.ToString()))
+				{
+					<th>
+						@Html.DisplayNameFor(model => model.Businesses.Data[0].Owner.Email)
+					</th>
+				}
+				<th>
+					Adres
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.Businesses.Data[0].Type)
+				</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model.Businesses.Data)
+			{
+				string fullAdress = $"{item.Street} {item.HouseNumber}{item.Mailbox}, {item.Zipcode} {item.City}";
+
+				<tr>
+					<td class="align-middle">
+						@if (item.DisplayPicture != null)
+						{
+							<a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@item.ID">
+								<img src="data:image;base64,@System.Convert.ToBase64String(item.DisplayPicture)" alt="Image of business @item.Name" class="main-business-picture rounded-circle m-0" style="height:150px;width:150px;" />
+							</a>
+						}
+						else
+						{
+							<a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@item.ID">
+								<img src="~/res/img/noimage.png" alt="No picture" class="main-business-picture rounded-circle m-0" style="height:150px;width:150px;" />
+							</a>
+						}
+					</td>
+					@if (User.IsInRole(UserRoleType.Admin.ToString()))
+					{
+						<td class="align-middle">
+							@Html.DisplayFor(modelItem => item.ID)
+						</td>
+					}
+					<td class="align-middle">
+						@Html.DisplayFor(modelItem => item.Name)
+					</td>
+					@if (User.IsInRole(UserRoleType.Admin.ToString()))
+					{
+						<td class="align-middle">
+							@Html.DisplayFor(modelItem => item.Owner.Email)
+						</td>
+					}
+					<td class="align-middle">
+						@fullAdress
+					</td>
+					<td class="align-middle">
+						@Html.DisplayFor(modelItem => item.Type)
+					</td>
+					<td class="align-middle">
+						<a asp-controller="tables" asp-action="index" asp-route-businessID="@item.ID">Tafelbeheer</a>
+					</td>
+					<td class="align-middle">
+						<a asp-action="Edit" asp-route-id="@item.ID">Bewerken</a> |
+						<a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+						<a asp-action="Delete" asp-route-id="@item.ID">Verwijderen</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+else
+{
+	<h1>
+		Bistro Overzicht
+		<br />
+		<small class="text-muted" style="margin-left:15px">Filtering</small>
+	</h1>
+	<form asp-action="Index">
+		<div class="row" style="margin-left:1px;">
+			<div class="form-group col-sm-3">
+				<label>Naam</label>
+				<input asp-for="Filter.Name" />
+			</div>
+			<div class="form-group col-sm-3">
+				<div class="form-group">
+					<label>Postcode</label>
+					<input asp-for="Filter.Zipcode" />
+				</div>
+			</div>
+		</div>
+
+		<div class="row" style="margin-left:1px;">
+			<div class="form-group col-sm-3">
+				<label asp-for="Filter.Type"></label>
+				<select asp-for="Filter.Type">
+					<option value=null>
+						Alles
+					</option>
+					@foreach (BusinessType bType in (BusinessType[])Enum.GetValues(typeof(BusinessType)))
+					{
+						if (bType != BusinessType.Unknown)
+						{
+							<option value="@bType">@EnumHelper.GetDisplayName(bType)</option>
+						}
+					}
+				</select>
+			</div>
+			<div class="form-group col-sm-6">
+				<div class="form-group">
+					<input asp-for="Filter.ShowOpenOnly" />
+					<label>Toon enkel open bistro's</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="row" style="margin-left:15px">
+
+			<div class="form-group col-xs-6">
+				<button class="btn btn-primary" asp-action="Index" type="submit">
+					Filter
+				</button>
+			</div>
+			<div class="form-group col-xs-6">
+				<a class="btn btn-light" asp-action="Index">
+					Ongedaan maken
+				</a>
+			</div>
+		</div>
+		<hr />
+	</form>
+
+	<div class="container">
+		<div class="row">
+			@if (Model.Businesses.Data.Count > 0)
+			{
+				int cardNumber = 0;
+				foreach (var business in Model.Businesses.Data)
+				{
+					cardNumber++;
+					<div class="col-sm-3" style="padding-bottom: 10px; padding-top: 10px;">
+						<div class="card">
+							@if (business.DisplayPicture != null)
+							{
+								<a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@business.ID">
+									<img class="card-img-top" alt="Image of business @business.Name" src="data:image;base64,@System.Convert.ToBase64String(business.DisplayPicture)"
+										 style="object-fit: cover; height:200px">
+								</a>
+							}
+							else
+							{
+								<a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@business.ID">
+									<img class="card-img-top" alt="No picture" src="~/res/img/noimage.png"
+										 style="object-fit: cover; height:200px">
+								</a>
+							}
+							<div class="card-header">
+								@{
+									var businessOpenStatus = BusinessManager.GetBusinessOpenStatus(business.ID);
+								}
+								
+								@if (businessOpenStatus == BusinessOpenStatus.Open || businessOpenStatus ==BusinessOpenStatus.ClosesSoon)
+								{
+									if (businessOpenStatus ==BusinessOpenStatus.ClosesSoon)
+									{
+										<span class="badge badge-warning">Sluit binnenkort</span>
+									}
+									else
+									{
+										<span class="badge badge-success">Open</span>
+									}
+								}
+								else
+								{
+									if (businessOpenStatus == BusinessOpenStatus.OpenSoon)
+									{
+										<span class="badge badge-info">Opent binnenkort</span>
+									}
+									else
+									{
+										<span class="badge badge-danger">Gesloten</span>
+									}
+								}
+								<br />
+								<h4 class="card-title">@business.Name</h4>
+								<h5 class="card-subtitle text-muted">@EnumHelper.GetDisplayName(business.Type)</h5>
+							</div>
+							@if (!String.IsNullOrWhiteSpace(business.Omschrijving))
+							{
+								<a data-toggle="collapse" href="#collapse-bistro-@cardNumber" aria-expanded="true" aria-controls="collapse-example" id="heading-example"
+								   class="d-block collapsed" style="text-decoration: none; color: inherit;">
+
+									<div class="card-body">
+										Omschrijving <i class="fa fa-chevron-down rotate pull-right vertical-center"></i>
+									</div>
+								</a>
+							}
+							@if (!String.IsNullOrWhiteSpace(business.Omschrijving))
+							{
+								<div id="collapse-bistro-@cardNumber" class="collapse" aria-labelledby="heading-example">
+									<ul class="list-group list-group-flush">
+										<li class="list-group-item">
+											@business.Omschrijving
+										</li>
+									</ul>
+								</div>
+							}
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item text-muted">
+									@business.Street @business.HouseNumber, @business.Zipcode @business.City
+								</li>
+							</ul>
+
+							<div class="card-footer text-center">
+								@if (businessOpenStatus == BusinessOpenStatus.Closed)
+								{
+									<a asp-controller="Orders" asp-action="Create" asp-route-id="@business.ID" class="btn btn-primary disabled">
+										Menu
+									</a>
+								}
+								else
+								{
+									<a asp-controller="Orders" asp-action="Create" asp-route-id="@business.ID" class="btn btn-primary">
+										Menu
+									</a>
+								}
+							</div>
+						</div>
+					</div>
+				}
+			}
+			else
+			{
+				<h1>Geen zaak gevonden.</h1>
+			}
+		</div>
+	</div>
+}

@@ -1,0 +1,63 @@
+﻿@model Bistronger.Data.Item
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Verwijderen</h1>
+
+<h3>Bent u zeker dat u dit wenst te verwijderen?</h3>
+<div>
+    <h4>Product</h4>
+    <hr />
+    <div class="row">
+        <dl class="row col-md-6">
+            <dt class="col-sm-2">
+                Naam
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt class="col-sm-2">
+                Beschrijving
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt class="col-sm-2">
+                Prijs
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+            <dt class="col-sm-2">
+                Type
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Type)
+            </dd>
+            <dt class="col-sm-2">
+                Afbeelding:
+            </dt>
+            <dd class="col-sm-10">
+                @if (Model.DisplayPicture != null)
+                {
+                    <img src="data:image;base64,@System.Convert.ToBase64String(Model.DisplayPicture)" alt="Image of business @Model.Name" class="main-business-picture" />
+                }
+                else
+                {
+                    <img src="~/res/img/noimage.png" alt="No picture" class="main-business-picture" />
+                }
+            </dd>
+        </dl>
+    </div>
+
+
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID" />
+        <input type="submit" value="Verwijderen" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

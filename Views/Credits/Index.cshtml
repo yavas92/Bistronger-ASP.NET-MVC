@@ -1,0 +1,171 @@
+﻿@using Bistronger.Models.Credits
+@using Bistronger.Areas.Identity.Manage
+@using Bistronger.Data.Enums
+
+@model CreditIndexViewModel
+
+@{
+    ViewData["Title"] = "Overzicht";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h1>Overzicht</h1>
+    <hr />
+
+    @if (!User.IsInRole(UserRoleType.Admin.ToString()))
+    {
+        <h4 style="text-align:center">U heeft <span style="color:goldenrod;">@Model.User.Credit Credits</span> op uw account.</h4>
+        <p style="text-align:center">
+            <a asp-action="purchase" type="button" class="btn btn-success btn-lg">Koop nieuwe credit(s)</a>
+        </p>
+        <hr />
+    }
+
+    <form asp-action="index">
+        <h3>Filter</h3>
+        <div class="row" style="margin-left:1px">
+            <div class="form-group col-sm-3">
+                <label>Status: </label>
+
+                <select asp-for="Filter.Status">
+                    <option value=null>
+                        All
+                    </option>
+                    @foreach (OrderStatus oStatus in (OrderStatus[])Enum.GetValues(typeof(OrderStatus)))
+                    {
+                        if (oStatus != OrderStatus.Unknown)
+                        {
+                            <option value="@oStatus">@EnumHelper.GetDisplayName(oStatus)</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            @if (User.IsInRole(UserRoleType.Admin.ToString()))
+            {
+                <div class="form-group col-sm-4">
+                    <label>Gebruiker ID: </label>
+                    <input asp-for="Filter.UserID" />
+                </div>
+                <div class="form-group col-sm-4">
+                    <label>Aankoop ID: </label>
+                    <input asp-for="Filter.PurchaseID" />
+                </div>
+            }
+        </div>
+        <div class="row" style="margin-left:1px">
+            <div class="form-group col-sm-3">
+                <label>Van: </label>
+                <input asp-for="Filter.From" type="date" />
+            </div>
+
+            <div class="form-group col-sm-3">
+                <label>Tot: </label>
+                <input asp-for="Filter.To" type="date" />
+            </div>
+        </div>
+
+        <div class="row" style="margin-left:15px">
+
+            <div class="form-group col-xs-6">
+                <button class="btn btn-primary" asp-action="index" type="submit">
+                    Filter
+                </button>
+            </div>
+            <div class="form-group col-xs-6">
+                <a class="btn btn-light" asp-action="index">
+                    Ongedaan maken
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr style="font-weight:bolder">
+                <th>
+                    ID
+                </th>
+                <th>
+                    Datum
+                </th>
+                @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                {
+                    <th>
+                        User ID
+                    </th>
+                }
+                <th>
+                    Aantal Credits
+                </th>
+                <th>
+                    Prijs
+                </th>
+                <th>
+                    Betaal Methode
+                </th>
+                <th>
+                    Status
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CreditPurchases.Data)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedOn)
+                    </td>
+                    @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserID)
+                        </td>
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Credits)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TotalPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Method)
+                    </td>
+                    <td>
+                        @{
+                            var dispName = @EnumHelper.GetDisplayName(item.Status);
+                        }
+                        @switch (item.Status)
+                        {
+                            case OrderStatus.Finished:
+                                <span class="badge badge-pill badge-success">@dispName</span>
+                                break;
+                            case OrderStatus.Unpaid:
+                                <span class="badge badge-pill badge-warning">@dispName</span>
+                                break;
+                            case OrderStatus.InProgress:
+                                <span class="badge badge-pill badge-info">@dispName</span>
+                                break;
+                            case OrderStatus.Cancelled:
+                                <span class="badge badge-pill badge-danger">@dispName</span>
+                                break;
+                        }
+                    </td>
+
+                    @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                    {
+                        <td>
+
+                            <a asp-action="details" asp-route-id="@item.ID">Details</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

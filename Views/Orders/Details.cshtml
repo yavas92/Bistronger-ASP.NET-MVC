@@ -1,0 +1,174 @@
+﻿@using Bistronger.Data.Enums
+@using Bistronger.Models.Orders
+
+
+@inject Bistronger.Data.Design.IBusinessManager businessManager;
+
+@model OrderDetailViewModel
+
+@{
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+	<h4>Bestelling</h4>
+	<hr />
+	@if (User.IsInRole(UserRoleType.Customer.ToString()))
+	{
+		<h4 style="text-align:left">U heeft <span style="color:goldenrod;">@Model.User.Credit Credits</span> op uw account.</h4>
+		<hr />
+	}
+	<dl class="row">
+		@if (Model.BusinessID != null)
+		{
+			<dt class="col-sm-2">
+				Bistro:
+			</dt>
+			<dd class="col-sm-10">
+				@businessManager.GetBusinessForDetails(Model.BusinessID.Value).Name
+			</dd>
+		}
+		<dt class="col-sm-2">
+			Bestellingnummer:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.ID)
+		</dd>
+		<dt class="col-sm-2">
+			Type:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.OrderType)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Status):
+		</dt>
+		<dd class="col-sm-10">
+			@{
+				var dispName = @EnumHelper.GetDisplayName(Model.Status);
+			}
+			@switch (Model.Status)
+			{
+				case OrderStatus.Finished:
+					<span class="badge badge-pill badge-success">@dispName</span>
+					break;
+				case OrderStatus.Unpaid:
+					<span class="badge badge-pill badge-warning">@dispName</span>
+					break;
+				case OrderStatus.InProgress:
+					<span class="badge badge-pill badge-info">@dispName</span>
+					break;
+				case OrderStatus.Cancelled:
+					<span class="badge badge-pill badge-danger">@dispName</span>
+					break;
+			}
+		</dd>
+		<dt class="col-sm-2">
+			Aangemaakt op:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.CreatedOn)
+		</dd>
+	</dl>
+
+	<hr />
+	@if (Model.Successful == false && Model.State == OrderDetailState.Payment)
+	{
+		<div class="alert alert-dismissible alert-warning">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<h4 class="alert-heading">Betaling mislukt!</h4>
+			<p class="mb-0">Je hebt niet genoeg credits op je account voor deze optie. Selecteer een andere optie of <a asp-controller="credits" asp-action="purchase" class="alert-link" target="_blank">koop meer credits</a>!</p>
+		</div>
+	}
+	else if (Model.Successful == true && Model.State == OrderDetailState.Payment)
+	{ <div class="alert alert-dismissible alert-success">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<h4 class="alert-heading">Betaling geslaagd!</h4>
+			<p class="mb-0">Je bestelling is succesvol betaald!</p>
+		</div>
+	}
+	<div class="row">
+		<div class="col-md-6">
+			@{
+				decimal totalPrice = 0.0m;
+			}
+
+			@foreach (ItemType itemType in (ItemType[])Enum.GetValues(typeof(ItemType)))
+			{
+				if (itemType != ItemType.Unknown && itemType != ItemType.Advert)
+				{
+					if (Model.OrderLines.Any(m => m.Item.Type == itemType))
+					{
+						<div class="d-flex justify-content-between">
+							<h5>
+								@EnumHelper.GetDisplayName(itemType)
+							</h5>
+							<h5 class="float-right">Credits</h5>
+						</div>
+						<hr class="hrMenu" />
+
+						decimal subtotaalCategorie = 0.0m;
+
+
+						@foreach (var item in Model.OrderLines)
+						{
+							if
+								(item.Item.Type == itemType)
+							{
+								<div class="d-flex justify-content-between">
+									@{
+										var totalItemPrice = item.Amount * item.Item.Price;
+										subtotaalCategorie += totalItemPrice.Value;
+									}
+									<div>
+										<label>@item.Amount x</label>
+										<a asp-action="Details" asp-controller="Items" asp-route-id=@item.Item.ID target="_blank">@item.Item.Name</a>
+									</div>
+									<div>
+										<label>@totalItemPrice</label>
+									</div>
+								</div>
+							}
+						}
+						totalPrice += subtotaalCategorie;
+
+
+						<div class="d-flex justify-content-between">
+							<p style="font-weight:bold">Subtotaal</p>
+							<p style="font-weight:bold">@subtotaalCategorie</p>
+						</div>
+					}
+				}
+			}
+			<div class="d-flex justify-content-between">
+				<p style="font-weight:bold;font-size:1.3rem">Totaal</p>
+				<p style="font-weight:bold;font-size:1.3rem">@totalPrice</p>
+			</div>
+		</div>
+	</div>
+</div>
+<div>
+	@if (Model.Status == OrderStatus.Unpaid)
+	{
+		@if (User.IsInRole(UserRoleType.Customer.ToString()))
+		{
+			<a asp-action="Payment" asp-route-id="@Model.ID" class="btn btn-success">Betalen</a>
+		}
+		@if (!User.IsInRole(UserRoleType.RestaurantOwner.ToString()))
+		{
+			<a asp-action="Delete" asp-route-id="@Model.ID" class="btn btn-danger">Annuleren</a>
+		}
+	}
+
+	@if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()))
+	{
+		<a asp-action="Overview">Terug naar overzicht bestellingen</a>
+	}
+	else
+	{
+		<a asp-action="Index">Terug naar overzicht bestellingen</a>
+	}
+</div>

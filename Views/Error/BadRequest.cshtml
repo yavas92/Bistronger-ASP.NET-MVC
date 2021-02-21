@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "400";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" name="viewport" content="width=device-width" />
+    <title>400: Ongeldige Aanvraag</title>
+</head>
+<body>
+    <div>
+        <center>
+            <img src="~/res/img/400_cutlery.png" alt="400" height="500">
+            <h1>Hoe heb je dat gedaan?</h1>
+            <h4>
+                <small class="text-muted">Ongeldige Aanvraag</small>
+            </h4>
+
+            <div class="btn-group-vertical">
+                <a href="#" onclick="history.go(-1)" class="btn btn-outline-primary">
+                    Ga Terug
+                </a>
+                <br />
+                <a asp-action="index" asp-controller="home" class="btn btn-outline-primary">
+                    Home
+                </a>
+            </div>
+        </center>
+    </div>
+</body>
+</html>

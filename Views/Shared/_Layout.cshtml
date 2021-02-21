@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/x-icon" href="@Url.Content("~/favicon.ico")" />
+    <link rel="shortcut icon" type="image/x-icon" href="@Url.Content("~/favicon.ico")" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Bistronger</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="~/res/img/LogoTextWhite.png" height="35" /></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="AboutUs">Over ons</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Businesses" asp-action="Index">Bistros</a>
+                        </li>
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container" style="padding:0px;">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="social_footer">
+                        <ul id="social_footer">
+                            <li id="social_footer">
+                                <a style="text-decoration:none" href="#"><i class="fa fa-facebook"></i></a>
+                            </li>
+                            <li id="social_footer">
+                                <a style="text-decoration:none" href="http://www.twitter.com/InfoBistronger" target="_blank"><i class="fa fa-twitter"></i></a>
+                            </li>
+                            <li id="social_footer">
+                                <a style="text-decoration:none" href="#"><i class="fa fa-google"></i></a>
+                            </li>
+                            <li id="social_footer">
+                                <a style="text-decoration:none" href="#"><i class="fa fa-instagram"></i></a>
+                            </li>
+                            <li id="social_footer">
+                                <a style="text-decoration:none" href="#"><i class="fa fa-linkedin"></i></a>
+                            </li>
+                            <li id="social_footer">
+                                <a style="text-decoration:none" href="#"><i class="fa fa-pinterest"></i></a>
+                            </li>
+                            <li id="social_footer">
+                                <a style="text-decoration:none" href="#"><i class="fa fa-foursquare"></i></a>
+                            </li>
+                        </ul>
+
+                        <p>&copy; 2020 - Bistronger <a style="margin-left:10px;" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> <a style="margin-left:10px;" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

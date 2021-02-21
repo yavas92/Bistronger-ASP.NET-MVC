@@ -1,0 +1,102 @@
+﻿@using Bistronger.Models.Packages
+@using Bistronger.Data.Enums
+
+@model PackageIndexViewModel
+
+@{
+    ViewData["Title"] = "Overzicht";
+}
+
+<h1>Overzicht</h1>
+<hr />
+
+<p style="text-align:center">
+    <a asp-action="create" type="button" class="btn btn-success btn-lg">Voeg nieuwe package toe</a>
+</p>
+<hr />
+@if (Model.Packages.Data.Count > 0)
+{
+    <form asp-action="index">
+        <h3>Filter</h3>
+        <div class="row" style="margin-left:1px">
+            <div class="form-group col-sm-3">
+                <label>Type: </label>
+
+                <select asp-for="Filter.Type">
+                    <option value=null>
+                        Alles
+                    </option>
+                    @foreach (PackageType pType in (PackageType[])Enum.GetValues(typeof(PackageType)))
+                    {
+                        if (pType != PackageType.Unknown)
+                        {
+                            <option value="@pType">@EnumHelper.GetDisplayName(pType)</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row" style="margin-left:15px">
+
+            <div class="form-group col-xs-6">
+                <button class="btn btn-primary" asp-action="index" type="submit">
+                    Filter
+                </button>
+            </div>
+            <div class="form-group col-xs-6">
+                <a class="btn btn-light" asp-action="index">
+                    Ongedaan maken
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Hoeveelheid
+                </th>
+                <th>
+                    Prijs
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var package in Model.Packages.Data)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => package.ID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => package.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => package.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => package.Price)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@package.ID">Bewerk</a> |
+                        <a asp-action="Delete" asp-route-id="@package.ID" class="text-danger">Verwijderen</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+else
+{
+    <h4>Er zijn nog geen packages aanwezig.</h4>
+}

@@ -1,0 +1,61 @@
+﻿@using Bistronger.Data.Enums
+@inject Bistronger.Data.Design.IMenuItemManager menuItemManager;
+
+@model Bistronger.Data.Menu
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Verwijderen</h1>
+
+<h3>Zeker dat je dit wilt verwijderen?</h3>
+<div>
+    <h4>Menu</h4>
+    <hr />
+	<dl class="row">
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Naam)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Naam)
+		</dd>
+		@foreach (ItemType itemType in (ItemType[])Enum.GetValues(typeof(ItemType)))
+		{
+			if (itemType != ItemType.Unknown && itemType != ItemType.Advert)
+			{
+				<dt class="col-sm-2">
+					@EnumHelper.GetDisplayName(itemType):
+				</dt>
+				<dd class="col-sm-10">
+					<ul class="pl-3">
+						@{int itemFound = 0;
+						}
+
+						@foreach (var item in menuItemManager.GetMenuItems(Model.ID).Data)
+						{
+							if
+								(item.Item.Type == itemType)
+							{
+								itemFound++;
+								<li>@item.Item.Name</li>
+							}
+						}
+
+						@if (itemFound == 0)
+						{
+							<li>Niet aanwezig op menu.</li>
+						}
+					</ul>
+				</dd>
+			}
+		}
+	</dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID" />
+        <input type="submit" value="Verwijder" class="btn btn-danger" /> |
+        <a asp-action="Index">Terug naar overzicht</a>
+    </form>
+</div>

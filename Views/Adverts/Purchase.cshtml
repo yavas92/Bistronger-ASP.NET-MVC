@@ -1,0 +1,96 @@
+﻿@using Bistronger.Models.Adverts
+@using Bistronger.Data.Enums
+@using Bistronger.Data
+
+@model AdvertPurchaseViewModel
+
+@{
+    ViewData["Title"] = "Aankoop";
+}
+
+@if (User.Identity.IsAuthenticated && !User.IsInRole(UserRoleType.Admin.ToString()))
+{
+    if (Model.Successful == false)
+    {
+        <div class="alert alert-dismissible alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Aankoop mislukt!</h4>
+            <p class="mb-0">Je hebt niet genoeg credits op je account voor deze optie. Selecteer een andere optie of <a asp-controller="credits" asp-action="purchase" class="alert-link">koop meer credits</a>!</p>
+        </div>
+    }
+    <div class="container">
+        <h2 style="text-align: center">Maak uw keuze:</h2>
+        <hr />
+
+        <form enctype="multipart/form-data" asp-action="purchase">
+            <div class="form-group" style="text-align: center">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+
+                    @{
+                        int count = 0;
+                    }
+                    @foreach (Package package in Model.Packages)
+                    {
+                        <div class="col-auto mb-3">
+                            <div class="card" style="width: 15rem">
+                                <div class="card-body" style="text-align:center">
+                                    <h4 class="card-title">
+                                        @package.Amount Shows
+                                    </h4>
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        @package.Price Credits
+                                    </h6>
+                                    <p class="card-text">
+                                        Uw advertentie zal @package.Amount keer getoond worden.
+                                    </p>
+                                    @if (count == 0)
+                                    {
+                                        count++;
+                                        <label class="btn btn-primary active">
+                                            <input asp-for="SelectedPackageID" value="@package.ID" type="radio" id="fade" autocomplete="off" style="display:none">Selecteer
+                                        </label>
+                                    }
+                                    else
+                                    {
+                                        <label class="btn btn-primary">
+                                            <input asp-for="SelectedPackageID" value="@package.ID" type="radio" id="fade" autocomplete="off" style="display:none">Selecteer
+                                        </label>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="BusinessID" class="control-label">Zaak</label>
+                <select asp-for="BusinessID" class="form-control">
+                    @foreach (Business business in Model.Businesses)
+                    {
+                        <option value="@business.ID">@business.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="form-group">
+                    <label asp-for="PhotoData">Afbeelding</label>
+                    <div class="custom-file">
+                        <input asp-for="PhotoData" class="form-control custom-file-input" />
+                        <label asp-for="PhotoData" class="custom-file-label">Kies bestand...</label>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="container" style="text-align: center">
+                <input type="submit" value="Koop met credits" class="btn btn-success" />
+                <br />
+                <a asp-action="index" class="btn btn-secondary">Terug</a>
+            </div>
+        </form>
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,72 @@
+﻿@using Bistronger.Models.Reservations
+@using Bistronger.Data.Enums
+@using Bistronger.Data
+@using Bistronger.Data.Design
+
+@inject IBusinessManager BusinessManager
+
+@model ReservationCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Creëer een nieuwe reservatie</h1>
+<h4>@Model.BusinessToReserve.Name</h4>
+
+<hr />
+
+@if (Model.FoundTable == false)
+{
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <h4 class="alert-heading">Reservatie mislukt!</h4>
+        <p class="mb-0">Er is geen tafel vrij op dit tijdstip voor dit aantal personen!</p>
+    </div>
+}
+
+<form enctype="multipart/form-data" asp-action="Create">
+    <input asp-for="BusinessID" type="hidden" />
+    <div class="row">
+        <div class="col-md-6">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="AmountOfGuests" class="control-label">Aantal gasten</label>
+                <input asp-for="AmountOfGuests" class="form-control" type="number"
+                       step="1"
+                       onkeypress="return event.keyCode === 8 || (event.charCode >= 48 && event.charCode <= 57) || (event.charCode >= 0 && event.charCode <= 9)" />
+                <span asp-validation-for="AmountOfGuests" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="card border-primary mb-3" style="min-width: 178px; max-width: 250px;">
+                    <div class="card-header">Reserveren op</div>
+                    <div class="card-body">
+                        <input asp-for="ReservationDate" type="datetime-local" />
+                        <span asp-validation-for="ReservationDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h5>Openingsuren:</h5>
+        <br />
+        <ul>
+            @foreach (var item in Model.BusinessHours)
+            {
+                string hours = $"{item.Day} {item.OpeningsHour.ToShortTimeString()} - {item.ClosingHour.ToShortTimeString()}";
+
+                <li>@hours</li>
+            }
+        </ul>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Reserveer" class="btn btn-primary" />
+        <a asp-controller="bistrodetails" asp-action="Details" asp-route-id="@Model.BusinessToReserve.ID">Terug naar bistro</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

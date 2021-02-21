@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "500";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" name="viewport" content="width=device-width" />
+    <title>500: Interne Server Fout</title>
+</head>
+<body>
+    <div>
+        <center>
+            <img src="~/res/img/500_plate.jpg" alt="500" height="500">
+            <h1>Oeps, er is iets misgegaan!</h1>
+            <h4>
+                <small class="text-muted">Interne Server Fout</small>
+            </h4>
+
+            <div class="btn-group-vertical">
+                <a href="#" onclick="history.go(-1)" class="btn btn-outline-primary">
+                    Ga Terug
+                </a>
+                <br />
+                <a asp-action="index" asp-controller="home" class="btn btn-outline-primary">
+                    Home
+                </a>
+            </div>
+        </center>
+    </div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+﻿@using Bistronger.Models.Businesses
+@model BusinessDetailViewModel
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <a asp-controller="Reservations" asp-action="Create" asp-route-businessID="@Model.ID" class="btn btn-info">Reserveer uw tafel</a>
+    <h2 class="text-center">@Html.DisplayFor(model => model.Name)</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <div>
+                <h5 style="margin-left:50px;">Locatie</h5>
+            </div>
+            <dl class="row">
+                <dt class="col-md-4">
+                    Straatnaam:
+                </dt>
+                <dd class="col-md-8">
+                    @Html.DisplayFor(model => model.Street)
+                </dd>
+                <dt class="col-md-4">
+                    Huisnummer:
+                </dt>
+                <dd class="col-md-8">
+                    @Html.DisplayFor(model => model.HouseNumber)
+                </dd>
+                <dt class="col-md-4">
+                    Postcode:
+                </dt>
+                <dd class="col-md-8">
+                    @Html.DisplayFor(model => model.Zipcode)
+                </dd>
+                <dt class="col-md-4">
+                    Stad:
+                </dt>
+                <dd class="col-md-8">
+                    @Html.DisplayFor(model => model.City)
+                </dd>
+            </dl>
+        </div>
+        <div class="col-md-6">
+
+            <dl>
+                <dt>
+                </dt>
+                <dd>
+                    @if (Model.DisplayPicture != null)
+                    {
+                        <img src="data:image;base64,@System.Convert.ToBase64String(Model.DisplayPicture)" alt="Image of business @Model.Name" class="details-business-picture img-fluid rounded" />
+                    }
+                    else
+                    {
+                        <img src="~/res/img/noimage.png" alt="No picture" class="details-business-picture img-fluid rounded" />
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+			<dl>
+				<dt>
+					Omschrijving:
+				</dt>
+				<dd class="text-break">
+					@Html.DisplayFor(model => model.Omschrijving)
+				</dd>
+				<dt>Socials</dt>
+				@if (Model.SocialMedia.Website == null && Model.SocialMedia.Facebook == null && Model.SocialMedia.Instagram == null && Model.SocialMedia.Twitter == null)
+				{
+					<dd>Geen socials beschikbaar.</dd>
+				}
+				else
+				{
+					if (Model.SocialMedia.Website != null)
+					{
+						<dd><a style="text-decoration:none" href="@Model.SocialMedia.Website">Website restaurant</a></dd>
+					}
+
+					if (Model.SocialMedia.Facebook != null)
+					{
+						<dd><a style="text-decoration:none" href="@Model.SocialMedia.Facebook"><i class="fa fa-facebook"></i></a></dd>
+					}
+					if (Model.SocialMedia.Instagram != null)
+					{
+						<dd><a style="text-decoration:none" href="@Model.SocialMedia.Instagram"><i class="fa fa-instagram"></i></a></dd>
+					}
+					if (Model.SocialMedia.Twitter != null)
+					{
+						<dd><a style="text-decoration:none" href="@Model.SocialMedia.Twitter"><i class="fa fa-twitter"></i></a></dd>
+					}
+				}
+			</dl>
+        </div>
+        <div class="col-md-6">
+            <h5>Openingsuren:</h5>
+			<ul>
+				@foreach (var item in Model.BusinessHours)
+				{
+					string hours = $"{item.Day}: {item.OpeningsHour.ToShortTimeString()} - {item.ClosingHour.ToShortTimeString()}";
+
+					bool open = (TimeSpan.Compare(item.OpeningsHour.TimeOfDay, item.ClosingHour.TimeOfDay) == -1);
+
+					if (open)
+					{
+						<li>@hours</li>
+					}
+					else
+					{
+						hours = $"{item.Day}: gesloten";
+						<li>@hours</li>
+					}
+				}				
+			</ul>
+        </div>
+    </div>
+</div>

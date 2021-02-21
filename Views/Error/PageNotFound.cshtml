@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "404";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" name="viewport" content="width=device-width" />
+    <title>404: Pagina niet gevonden</title>
+</head>
+<body>
+    <div>
+        <center>
+            <img src="~/res/img/404_plate.jpg" alt="404" height="500">
+            <h1>Er is hier niets meer voor jou!</h1>
+            <h4>
+                <small class="text-muted">Pagina niet gevonden</small>
+            </h4>
+
+            <div class="btn-group-vertical">
+                <a href="#" onclick="history.go(-1)" class="btn btn-outline-primary">
+                    Ga Terug
+                </a>
+                <br />
+                <a asp-action="index" asp-controller="home" class="btn btn-outline-primary">
+                    Home
+                </a>
+            </div>
+        </center>
+    </div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+﻿@using Bistronger.Models.Items
+@using Bistronger.Data.Enums
+
+@model ItemIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1></h1>
+<h1>Uw producten</h1>
+@if (User.IsInRole(UserRoleType.RestaurantOwner.ToString()))
+{
+    <p>
+        <a asp-action="Create">Crëeer een nieuw product.</a>
+    </p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            @if (User.IsInRole(UserRoleType.Admin.ToString()))
+            {
+                <th>
+                    ID
+                </th>
+                <th>
+                    Email
+                </th>
+            }
+            <th>
+                Afbeelding
+            </th>
+            <th>
+                Naam
+            </th>
+            <th>
+                Beschrijving
+            </th>
+            <th>
+                Prijs
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Handelingen
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items.Data)
+        {
+            <tr>
+                @if (User.IsInRole(UserRoleType.Admin.ToString()))
+                {
+                    <td class="align-middle">
+                        @Html.DisplayFor(modelItem => item.ID)
+                    </td>
+                    <td class="align-middle">
+                        @Html.DisplayFor(modelItem => item.Owner.Email)
+                    </td>
+                }
+                <td class="align-middle">
+                    @if (item.DisplayPicture != null)
+                    {
+                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.ID">
+                            <img src="data:image;base64,@System.Convert.ToBase64String(item.DisplayPicture)" alt="Image of business @item.Name" class="main-business-picture rounded-circle m-0" style="height:150px;width:150px;" />
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.ID">
+                            <img src="~/res/img/noimage.png" alt="No picture" class="main-business-picture rounded-circle m-0" style="height:150px;width:150px;" />
+                        </a>
+                    }
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td class="align-middle">
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+				<td class="align-middle">
+					<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+					<a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+					<a asp-action="Delete" asp-route-id="@item.ID">Verwijderen</a>
+				</td>
+            </tr>
+        }
+    </tbody>
+</table>

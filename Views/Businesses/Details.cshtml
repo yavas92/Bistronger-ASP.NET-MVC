@@ -1,0 +1,168 @@
+@* Stijn *@
+
+@using Bistronger.Models.Businesses
+@using Bistronger.Data.Enums
+
+
+@model BusinessDetailViewModel
+
+@{
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+	<h4>Zaak</h4>
+	<hr />
+	<dl class="row">
+		@if (User.IsInRole(UserRoleType.Admin.ToString()))
+		{
+			<dt class="col-sm-2">
+				Business ID:
+			</dt>
+			<dd class="col-sm-10">
+				@Html.DisplayFor(model => model.ID)
+			</dd>
+			<dt class="col-sm-2">
+				Email:
+			</dt>
+			<dd class="col-sm-10">
+				@Html.DisplayFor(model => model.Email)
+			</dd>
+		}
+		<dt class="col-sm-2">
+			Naam:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Name)
+		</dd>
+		<dt class="col-sm-2">
+			Straatnaam:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Street)
+		</dd>
+		<dt class="col-sm-2">
+			Huisnummer:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.HouseNumber)
+		</dd>
+		<dt class="col-sm-2">
+            Bus:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Mailbox)
+        </dd>
+		<dt class="col-sm-2">
+			Postcode:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Zipcode)
+		</dd>
+		<dt class="col-sm-2">
+			Stad:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.City)
+		</dd>
+		<dt class="col-sm-2">
+			Zaak type:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Type)
+		</dd>
+		<dt class="col-sm-2">
+			Menu:
+		</dt>
+		<dd class="col-sm-10">
+			@if (Model.MenuID > 0)
+			{
+				<a href="/Menus/Details/@Model.MenuID" target="_blank" id="menuLink">Items die op het menu staan</a>
+			}
+			else
+			{
+				<p>Nog geen menu toegekend.</p>
+			}
+		</dd>
+		<dt class="col-sm-2">
+			Omschrijving:
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Omschrijving)
+		</dd>
+		<dt class="col-sm-2">
+			Afbeelding:
+		</dt>
+		<dd class="col-sm-10">
+			@if (Model.DisplayPicture != null)
+			{
+				<a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@Model.ID">
+					<img src="data:image;base64,@System.Convert.ToBase64String(Model.DisplayPicture)" alt="Image of business @Model.Name" class="main-business-picture" />
+				</a>
+			}
+			else
+			{
+				<a asp-controller="BistroDetails" asp-action="Details" asp-route-id="@Model.ID">
+					<img src="~/res/img/noimage.png" alt="No picture" class="main-business-picture" />
+				</a>
+			}
+		</dd>
+		<dt class="col-sm-2">
+			Openingstijden:
+		</dt>
+		<dd class="col-sm-10">
+			<ul>
+				@foreach (var item in Model.BusinessHours)
+				{
+					string hours = $"{item.Day}: {item.OpeningsHour.ToShortTimeString()} - {item.ClosingHour.ToShortTimeString()}";
+
+					bool open = (TimeSpan.Compare(item.OpeningsHour.TimeOfDay, item.ClosingHour.TimeOfDay) == -1);
+
+					if (open)
+					{
+					<li>@hours</li>
+					}
+					else
+					{
+						hours = $"{item.Day}: gesloten";
+						<li>@hours</li>
+					}
+				}
+			</ul>
+		</dd>
+		<dt class="col-sm-2">Socials:</dt>
+		<div class="col-sm-10">
+			@if (Model.SocialMedia.Website == null && Model.SocialMedia.Facebook == null && Model.SocialMedia.Instagram == null && Model.SocialMedia.Twitter == null)
+			{
+				<dd>Geen socials beschikbaar.</dd>
+			}
+			else
+			{
+				if (Model.SocialMedia.Website != null)
+				{
+					<dd><a style="text-decoration:none" href="@Model.SocialMedia.Website">Website restaurant</a></dd>
+				}
+
+				if (Model.SocialMedia.Facebook != null)
+				{
+					<dd><a style="text-decoration:none" href="@Model.SocialMedia.Facebook"><i class="fa fa-facebook"></i></a></dd>
+				}
+				if (Model.SocialMedia.Instagram != null)
+				{
+					<dd><a style="text-decoration:none" href="@Model.SocialMedia.Instagram"><i class="fa fa-instagram"></i></a></dd>
+				}
+				if (Model.SocialMedia.Twitter != null)
+				{
+					<dd><a style="text-decoration:none" href="@Model.SocialMedia.Twitter"><i class="fa fa-twitter"></i></a></dd>
+				}
+			}
+		</div>
+	</dl>
+</div>
+<div>
+	<a asp-action="Edit" asp-route-id="@Model.ID">Bewerken</a> |
+	<a asp-action="Index">Terug naar de lijst</a>
+</div>

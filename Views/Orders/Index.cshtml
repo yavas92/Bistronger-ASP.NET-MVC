@@ -1,0 +1,95 @@
+﻿@using Bistronger.Models.Orders
+@using Bistronger.Data.Enums
+
+@inject Bistronger.Data.Design.IBusinessManager businessManager;
+
+@model OrderIndexViewModel
+
+@{
+	ViewData["Title"] = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Bestellingen</h1>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				ID
+			</th>
+			@if (User.IsInRole(UserRoleType.Admin.ToString()))
+			{
+				<th>
+					Klant
+				</th>
+			}
+			<th>
+				Bistro
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Orders.Data[0].Status)
+			</th>
+			<th>
+				Aangemaakt op
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model.Orders.Data)
+		{
+			@if (item.OrderType == OrderType.OnlineOrder)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(modelItem => item.ID)
+					</td>
+					@if (User.IsInRole(UserRoleType.Admin.ToString()))
+					{
+						<td>
+							@item.User.Email
+						</td>
+					}
+					@if (item.BusinessID != null)
+					{
+						<td>
+							@businessManager.GetBusinessForDetails(item.BusinessID.Value).Name
+						</td>
+					}
+					<td>
+						@{
+							var dispName = @EnumHelper.GetDisplayName(item.Status);
+						}
+						@switch (item.Status)
+						{
+							case OrderStatus.Finished:
+								<span class="badge badge-pill badge-success">@dispName</span>
+								break;
+							case OrderStatus.Unpaid:
+								<span class="badge badge-pill badge-warning">@dispName</span>
+								break;
+							case OrderStatus.InProgress:
+								<span class="badge badge-pill badge-info">@dispName</span>
+								break;
+							case OrderStatus.Cancelled:
+								<span class="badge badge-pill badge-danger">@dispName</span>
+								break;
+						}
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.CreatedOn)
+					</td>
+					<td>
+						<a asp-action="Details" asp-route-id="@item.ID">Details</a>
+						@{ if (item.Status == OrderStatus.Unpaid)
+							{
+								<a asp-action="Delete" asp-route-id="@item.ID">| Annuleren</a>
+							}
+						}
+					</td>
+				</tr>
+			}
+		}
+	</tbody>
+</table>
